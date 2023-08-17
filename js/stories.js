@@ -25,7 +25,7 @@ function generateStoryMarkup(story, showDeleteBtn = false) {
   const hostName = story.getHostName();
 
   const isLoggedIn = Boolean(currentUser);
-  const favorited = currentUser.favorites.some(s => (s.storyId === story.storyId)) ? "fas" : "far"
+  const favorited = isLoggedIn ? currentUser.favorites.some(s => (s.storyId === story.storyId)) ? "fas" : "far" : "";
 
   const star = !isLoggedIn ? '' : `
       <span class="star">
@@ -99,8 +99,9 @@ $owned.on("click", '.trash-can', async (e) => {
 function putUserStoriesOnPage() {
   $owned.empty();
 
-  if (!currentUser.ownStories.length) {
+  if (currentUser.ownStories.length < 1) {
     $owned.append("<h5>No stories added by user yet!</h5>");
+    $owned.show();
     return;
   }
 
@@ -114,8 +115,9 @@ function putUserStoriesOnPage() {
 function putFavoritesListOnPage() {
   $favorites.empty();
 
-  if (!currentUser.favorites.length) {
+  if (currentUser.favorites.length < 1) {
     $favorites.append("<h5>No favorites added!</h5>");
+    $favorites.show();
     return;
   }
 
@@ -142,11 +144,11 @@ $stories.on("click", ".star", async (e) => {
 
   if ($target.hasClass("fas")) {
     currentUser.favorites = currentUser.favorites.filter(s => s.storyId !== story.storyId);
-    await toggleFavorite(currentUser, story);
+    await toggleFavorite(currentUser, story, false);
     $target.closest("i").toggleClass("fas far");
   } else {
     currentUser.favorites.push(story);
-    await toggleFavorite(currentUser, story, false)
+    await toggleFavorite(currentUser, story)
     $target.closest("i").toggleClass("fas far");
   }
 });
